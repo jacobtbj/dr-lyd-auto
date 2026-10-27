@@ -22,33 +22,23 @@ Et nyt program tilføjes i bilen ved at indsætte dr.dk-linket eller navnet unde
 
 ## Første gang: få appen i bilen
 
-### 1. Byg appen
-Hver gang der skubbes til `main`, bygger GitHub Actions appen (fanen **Actions**).
-Den laver altid en test-udgave (`.apk`) og, når upload-nøglen er sat op, også udgaven til Google Play (`.aab`).
+### 1. Byg appen på din egen computer
+Projektet bygges lokalt i Android Studio (gratis). Der bruges ingen GitHub Actions.
 
-**Upload-nøgle** (én gang). Kør på din computer (kræver Java):
+1. Installer Android Studio fra developer.android.com/studio.
+2. File → Open → vælg mappen `dr-lyd-auto`. Vent til Android Studio har hentet det, den skal bruge.
+3. **Test-udgave:** Build → Build App Bundle(s) / APK(s) → Build APK(s).
+4. **Udgave til Google Play:** Build → Generate Signed App Bundle or APK → Android App Bundle →
+   *Create new…* for at lave en upload-nøgle første gang → vælg **release**.
+   Filen havner i `app/release/app-release.aab`.
 
-```
-keytool -genkeypair -v -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
-base64 -i upload.jks | pbcopy        # macOS: kopierer filen som tekst
-```
-
-Læg fire hemmeligheder i repoet under Settings → Secrets and variables → Actions:
-
-| Navn | Værdi |
-|---|---|
-| `SIGNING_KEYSTORE_BASE64` | teksten fra base64-kommandoen |
-| `SIGNING_STORE_PASSWORD` | adgangskoden du valgte |
-| `SIGNING_KEY_ALIAS` | `upload` |
-| `SIGNING_KEY_PASSWORD` | adgangskoden du valgte |
-
-Gem `upload.jks` og adgangskoden et sikkert sted. Mister du dem, kan Google nulstille nøglen.
-
-Alternativ: åbn projektet i Android Studio → Build → Generate Signed App Bundle.
+Gem upload-nøglen (`.jks`-filen) og adgangskoden et sikkert sted. Mister du dem, kan Google nulstille nøglen.
+Hver ny version til Play skal have et højere versionsnummer: sæt `VERSION_CODE` (fx 2, 3, 4 …)
+som miljøvariabel, eller ret `versionCode` i `app/build.gradle.kts`.
 
 ### 2. Test i emulator (valgfrit, anbefales)
 Android Studio → Device Manager → opret en *Automotive*-enhed (eller Polestars emulator) →
-træk `.apk`-filen over i emulatoren → åbn Medier og vælg DR Lyd.
+kør appen med den grønne afspil-knap → åbn Medier og vælg DR Lyd.
 
 ### 3. Google Play (internt testspor, ingen godkendelse)
 1. Opret udviklerkonto på play.google.com/console (engangsbeløb, 25 USD, kræver ID-bekræftelse).
@@ -56,11 +46,11 @@ træk `.apk`-filen over i emulatoren → åbn Medier og vælg DR Lyd.
 3. Opsætning → Avancerede indstillinger → **Formfaktorer** → tilføj **Android Automotive OS**.
 4. Test og udgiv → Test → **Intern test** (vælg sporet for Android Automotive OS) →
    opret testerliste med din egen Gmail.
-5. Opret udgivelse → upload `.aab`-filen fra Actions → udgiv.
+5. Opret udgivelse → upload `app-release.aab` → udgiv.
 6. Åbn tilmeldingslinket fra testsiden på telefonen og tryk **Bliv tester**.
 7. I bilen: Play Butik (logget ind med samme Google-konto) → søg "DR Lyd (privat)" → installer.
 
-Næste version: skub kode til `main`, upload den nye `.aab` i samme spor. Bilen opdaterer selv.
+Næste version: byg en ny `.aab` med højere versionsnummer og upload den i samme spor. Bilen opdaterer selv.
 
 ## Struktur
 
